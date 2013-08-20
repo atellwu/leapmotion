@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<!--
+/------------------------------------------------------------------------------\
+| Copyright (C) 2012-2013 Leap Motion, Inc. All rights reserved.               |
+| Leap Motion proprietary and confidential. Not for distribution.              |
+| Use subject to the terms of the Leap Motion SDK Agreement available at       |
+| https://developer.leapmotion.com/sdk_agreement, or another agreement         |
+| between Leap Motion and you, your company or other organization.             |
+\------------------------------------------------------------------------------/
+-->
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <title>Leap Motion JavaScript Sample</title>
+        <style>
+            .hand {
+                background-image: url('my-images/cursor_hand.png');
+                position: absolute;
+                left: 200px;
+                top: 200px;
+                width: 48px;
+                height: 48px;
+            }
+            .hand.drag {
+                background-image: url('my-images/cursor_drag_hand.png');
+            }
+        </style>
+        <script src="my-js/jquery-1.7.2.min.js"></script>
+        <script src="./leap.js"></script>
+        <script>
+            // Setup Leap loop with frame callback function
+            var controllerOptions = {
+                enableGestures : true
+            };
+
+            //进入屏幕，0.5秒后，开始初始化位置，直到初始化成功
+            // function initPosition() {
+
+            // setTimeout(function() {
+            // initPositionTask = setInterval(_initPosition, 10);
+            // }, 500);
+            // }
+            //
+            // function _initPosition() {
+            // var frame = curFrame;
+            // if (frame.hands.length > 0) {
+            // var hand = frame.hands[0];
+            // if (hand.fingers.length >= 4) {
+            // var vector = hand.palmPosition;
+            // initedPosition = {
+            // left : vector[0],
+            // top : vector[2]
+            // };
+            //
+            // positionInited = true;
+            // clearTimeout(initPositionTask);
+            // }
+            // }
+            // }
+
+            // function resetPosition() {
+            // clearTimeout(initPositionTask);
+            // positionInited = false;
+            // initedPosition = null;
+            // }
+
+            var windowWidth = $(window).width();
+            var windowHeight = $(window).height();
+            var positionInited = false;
+            var initedPosition = null;
+            var initedHandPosition = null;
+            var ratio = 5;
+
+            function setPosition(hand) {
+                var vector = hand.palmPosition;
+                var top = initedPosition.top + (vector[2] - initedHandPosition.top) * ratio;
+                var left = initedPosition.left + (vector[0] - initedHandPosition.left) * ratio;
+                if (top < 0) {
+                    top = 0;
+                }
+                if (left < 0) {
+                    left = 0;
+                }
+                if (top > windowHeight - 48) {
+                    top = windowHeight - 48;
+                }
+                if (left > windowWidth - 48) {
+                    left = windowWidth - 48;
+                }
+
+                var offset = {
+                    top : top,
+                    left : left
+                };
+                $('#hand').offset(offset);
+                initedPosition = offset;
+                initedHandPosition = {
+                    top : vector[2],
+                    left : vector[0]
+                };
+            }
+
+            var lazyReady = false;
+            var lazyReadyTask = null;
+            Leap.loop(controllerOptions, function(frame) {
+                if (frame.hands.length > 0) {
+                    var hand = frame.hands[0];
+                    if (!positionInited) {
+                        if (lazyReady) {
+                            var hand = frame.hands[0];
+                            if (hand.fingers.length >= 4) {
+                                var vector = hand.palmPosition;
+                                initedPosition = $('#hand').offset();
+                                initedHandPosition = {
+                                    left : vector[0],
+                                    top : vector[2]
+                                };
+                                console.log("inited position");
+                                console.log(initedPosition);
+                                console.log(initedHandPosition);
+
+                                positionInited = true;
+                            }
+                        } else {
+                            if (lazyReadyTask == null) {
+                                lazyReadyTask = setTimeout(function() {
+                                    lazyReady = true;
+                                }, 200);
+                            }
+                        }
+                    } else {
+                        var hand = frame.hands[0];
+                        if (hand.fingers.length >= 4) {
+                            if ($('#hand').hasClass('drag')) {
+                                $('#hand').removeClass('drag');
+                            }
+                            //移动
+                            setPosition(hand);
+                        } else {
+                            if (!$('#hand').hasClass('drag')) {
+                                $('#hand').addClass('drag');
+                            } else {//变拖动手势时，位置会变，此时不移动
+                                //拖动
+                                setPosition(hand);
+                            }
+                        }
+
+                    }
+                } else {
+                    clearTimeout(lazyReadyTask);
+                    lazyReady = false;
+                    positionInited = false;
+                    lazyReadyTask = null;
+                    $('#hand').removeClass('drag');
+                }
+
+            })
+
+        </script>
+    </head>
+    <body onload="">
+        <div id='hand' class="hand"></div>
+    </body>
+</html>
