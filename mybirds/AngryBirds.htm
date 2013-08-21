@@ -116,7 +116,7 @@
                     if (!positionInited) {
                         if (lazyReady) {
                             var hand = frame.hands[0];
-                            if (hand.fingers.length < 4) {
+                            if (hand.fingers.length <= 2) {
                                 var vector = hand.palmPosition;
                                 initedHandPosition = {
                                     left : vector[0],
@@ -136,7 +136,7 @@
                         }
                     } else {
                         var hand = frame.hands[0];
-                        if (hand.fingers.length >= 4) {//发射
+                        if (hand.fingers.length >= 3) {//发射
 
                             var startX2 = bird.x + bird.getWidth() * 0.5;
                             var startY2 = bird.y + bird.getHeight() * 0.5;
