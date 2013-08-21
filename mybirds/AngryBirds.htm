@@ -1,35 +1,175 @@
 <!DOCTYPE html>
 <html>
-<head>
-<meta charset="UTF-8"> 
-<title>AngryBirds</title>
-<script type="text/javascript" src="Box2dWeb-2.1.a.3.min.js"></script> 
-<script type="text/javascript" src="lufylegend-1.7.3.min.js"></script> 
-<script type="text/javascript" src="Bird.js"></script> 
-<script type="text/javascript" src="Pig.js"></script> 
-<script type="text/javascript" src="Stage.js"></script> 
-<script type="text/javascript" src="RemoveObject.js"></script> 
-<script type="text/javascript" src="Main.js"></script> 
-<script type="text/javascript">
-function doScroll() {
-	if(window.pageYOffset === 0) {
-		window.scrollTo(0, 1);
-	}
-}
-window.onload = function() {
-	setTimeout(doScroll, 100);
-	LSystem.screen(LStage.FULL_SCREEN);
-	init(10,"mylegend",1800,480,main,LEvent.INIT);
-}
-window.onorientationchange = function() {
-	setTimeout(doScroll, 100);
-};
-window.onresize = function() {
-	setTimeout(doScroll, 100);
-}
-</script>
-</head>
-<body>
-<div id="mylegend">loading……</div>
-</body>
+    <head>
+        <meta charset="UTF-8">
+        <title>AngryBirds</title>
+        <script type="text/javascript" src="Box2dWeb-2.1.a.3.min.js"></script>
+        <script type="text/javascript" src="lufylegend-1.7.3.min.js"></script>
+        <script type="text/javascript" src="Bird.js"></script>
+        <script type="text/javascript" src="Pig.js"></script>
+        <script type="text/javascript" src="Stage.js"></script>
+        <script type="text/javascript" src="RemoveObject.js"></script>
+        <script type="text/javascript" src="Main.js"></script>
+        <script type="text/javascript">
+            function doScroll() {
+                if (window.pageYOffset === 0) {
+                    window.scrollTo(0, 1);
+                }
+            }
+
+
+            window.onload = function() {
+                setTimeout(doScroll, 100);
+                LSystem.screen(LStage.FULL_SCREEN);
+                init(10, "mylegend", 1400, 480, main, LEvent.INIT);
+            }
+            window.onorientationchange = function() {
+                setTimeout(doScroll, 100);
+            };
+            window.onresize = function() {
+                setTimeout(doScroll, 100);
+            }
+        </script>
+
+        <script src="../my-js/jquery-1.7.2.min.js"></script>
+        <script src="../leap.js"></script>
+        <script>
+            // Setup Leap loop with frame callback function
+            var controllerOptions = {
+                enableGestures : true
+            };
+
+            //进入屏幕，0.5秒后，开始初始化位置，直到初始化成功
+            // function initPosition() {
+
+            // setTimeout(function() {
+            // initPositionTask = setInterval(_initPosition, 10);
+            // }, 500);
+            // }
+            //
+            // function _initPosition() {
+            // var frame = curFrame;
+            // if (frame.hands.length > 0) {
+            // var hand = frame.hands[0];
+            // if (hand.fingers.length >= 4) {
+            // var vector = hand.palmPosition;
+            // initedPosition = {
+            // left : vector[0],
+            // top : vector[2]
+            // };
+            //
+            // positionInited = true;
+            // clearTimeout(initPositionTask);
+            // }
+            // }
+            // }
+
+            // function resetPosition() {
+            // clearTimeout(initPositionTask);
+            // positionInited = false;
+            // initedPosition = null;
+            // }
+
+            var windowWidth = $(window).width();
+            var windowHeight = $(window).height();
+            var positionInited = false;
+            var initedPosition = null;
+            var initedHandPosition = null;
+            var ratio = 25;
+            var lastX, lastY;
+
+            //调用小鸟move
+            function setPosition(hand) {
+                var vector = hand.palmPosition;
+
+                var startX0 = initedHandPosition.left * ratio;
+                var startY0 = initedHandPosition.top * ratio;
+                var selfX = vector[0] * ratio;
+                var selfY = vector[2] * ratio;
+
+                var r = Math.sqrt(Math.pow((startX0 - selfX), 2) + Math.pow((startY0 - selfY), 2));
+                r = r / 5;
+                if (r > 100)
+                    r = 100;
+                var angle = Math.atan2(selfY - startY0, selfX - startX0);
+
+                if (Math.abs(lastX - selfX) > 10 || Math.abs(lastY - selfY) > 10) {//大于20才动，颤抖即不动
+
+                    bird.x = Math.cos(angle) * r + startX - bird.getWidth() * 0.5;
+                    bird.y = Math.sin(angle) * r + startY - bird.getHeight() * 0.5;
+
+                    lastX = selfX;
+                    lastY = selfY;
+                }
+
+            }
+
+            var lazyReady = false;
+            var shooting=false;
+            var lazyReadyTask = null;
+            Leap.loop(controllerOptions, function(frame) {
+                if(shooting){
+                    return;
+                }
+                if (frame.hands.length > 0) {
+                    var hand = frame.hands[0];
+                    if (!positionInited) {
+                        if (lazyReady) {
+                            var hand = frame.hands[0];
+                            if (hand.fingers.length < 4) {
+                                var vector = hand.palmPosition;
+                                initedHandPosition = {
+                                    left : vector[0],
+                                    top : vector[2]
+                                };
+                                lastX = initedHandPosition.left * ratio;
+                                lastY = initedHandPosition.top * ratio;
+
+                                positionInited = true;
+                            }
+                        } else {
+                            if (lazyReadyTask == null) {
+                                lazyReadyTask = setTimeout(function() {
+                                    lazyReady = true;
+                                }, 200);
+                            }
+                        }
+                    } else {
+                        var hand = frame.hands[0];
+                        if (hand.fingers.length >= 4) {//发射
+
+                            var startX2 = bird.x + bird.getWidth() * 0.5;
+                            var startY2 = bird.y + bird.getHeight() * 0.5;
+                            var r = Math.sqrt(Math.pow((startX - startX2), 2) + Math.pow((startY - startY2), 2));
+                            var angle = Math.atan2(startY2 - startY, startX2 - startX);
+
+                            bird.addBodyCircle(bird.getWidth() * 0.5, bird.getHeight() * 0.5, bird.getWidth() * 0.5, 1, 5, .4, .3);
+                            var force = 70;
+                            var vec = new LGlobal.box2d.b2Vec2(-force * r * Math.cos(angle), -force * r * Math.sin(angle));
+                            bird.box2dBody.ApplyForce(vec, bird.box2dBody.GetWorldCenter());
+                            
+                            shooting=true;
+
+                        } else {
+                            setPosition(hand);
+                        }
+
+                    }
+                } else {
+                    clearTimeout(lazyReadyTask);
+                    lazyReady = false;
+                    positionInited = false;
+                    lazyReadyTask = null;
+                }
+
+            })
+
+        </script>
+
+    </head>
+    <body>
+        <div id="mylegend">
+            loading……
+        </div>
+    </body>
 </html>

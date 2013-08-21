@@ -5,21 +5,21 @@ var bird,centerlayer;
 var bitmap,slingshotJoin;
 var imglist = {};
 var imgData = new Array(
-		{name:"bird1",path:"http://lufylegend.com/demo/AngryBirds/images/bird1.png"},
-		{name:"slingshot1",path:"http://lufylegend.com/demo/AngryBirds/images/slingshot1.png"},
-		{name:"slingshot2",path:"http://lufylegend.com/demo/AngryBirds/images/slingshot2.png"},
-		{name:"remove",path:"http://lufylegend.com/demo/AngryBirds/images/remove.png"},
-		{name:"pig01",path:"http://lufylegend.com/demo/AngryBirds/images/pig01.png"},
-		{name:"pig02",path:"http://lufylegend.com/demo/AngryBirds/images/pig02.png"},
-		{name:"st01",path:"http://lufylegend.com/demo/AngryBirds/images/st01.png"},
-		{name:"st02",path:"http://lufylegend.com/demo/AngryBirds/images/st02.png"},
-		{name:"st11",path:"http://lufylegend.com/demo/AngryBirds/images/st11.png"},
-		{name:"st12",path:"http://lufylegend.com/demo/AngryBirds/images/st12.png"},
-		{name:"st21",path:"http://lufylegend.com/demo/AngryBirds/images/st21.png"},
-		{name:"st22",path:"http://lufylegend.com/demo/AngryBirds/images/st22.png"},
-		{name:"st31",path:"http://lufylegend.com/demo/AngryBirds/images/st31.png"},
-		{name:"st32",path:"http://lufylegend.com/demo/AngryBirds/images/st32.png"},
-		{name:"desk",path:"http://lufylegend.com/demo/AngryBirds/images/desk.png"}
+		{name:"bird1",path:"images/bird1.png"},
+		{name:"slingshot1",path:"images/slingshot1.png"},
+		{name:"slingshot2",path:"images/slingshot2.png"},
+		{name:"remove",path:"images/remove.png"},
+		{name:"pig01",path:"images/pig01.png"},
+		{name:"pig02",path:"images/pig02.png"},
+		{name:"st01",path:"images/st01.png"},
+		{name:"st02",path:"images/st02.png"},
+		{name:"st11",path:"images/st11.png"},
+		{name:"st12",path:"images/st12.png"},
+		{name:"st21",path:"images/st21.png"},
+		{name:"st22",path:"images/st22.png"},
+		{name:"st31",path:"images/st31.png"},
+		{name:"st32",path:"images/st32.png"},
+		{name:"desk",path:"images/desk.png"}
 		);
 var startX,startY;
 function main(){
@@ -165,7 +165,10 @@ function postSolve(contact, impulse){
 function start(){
 	LGlobal.box2d.setEvent(LEvent.POST_SOLVE,postSolve);
 	bird.x = 200,bird.y = 320;
+	
+	//握拳头时调用downStart
 	backLayer.addEventListener(LMouseEvent.MOUSE_DOWN,downStart);
+	
 	startX = bird.x + bird.getWidth()*0.5;
 	startY = bird.y + bird.getHeight()*0.5;
 }
