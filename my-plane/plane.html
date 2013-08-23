@@ -2,7 +2,9 @@
 <html lang="en">
 
     <head>
-        <title>HTML5 Helicopter</title>
+        <title>是男人就要飞1000米！</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
 
         <link rel="stylesheet" href="syntax.css" />
         <link rel="stylesheet" href="screen.css" media="screen, projection" />
@@ -13,9 +15,9 @@
 
         <div class="site">
             <div id="post">
-                <h1 class="title">HTML5 Helicopter</h1>
+                <h1 class="title">是男人就要飞1000米！</h1>
                 <div class="meta">
-                    5th August 2010
+                    @dianping
                 </div>
                 <span style="font-family:SilkScreenBold;"> </span>
                 <span style="font-family:SilkScreen;"> </span>
@@ -65,13 +67,37 @@
                     Leap.loop(controllerOptions, function(frame) {
                         if (frame.hands.length > 0) {
                             var hand = frame.hands[0];
-                            console.log(hand.fingers.length);
-                            if (hand.fingers.length <= 1) {
+                            if (hand.fingers.length <= 2) {
                                 thrustersOn = true;
                             } else {
                                 thrustersOn = false;
                             }
+                        } else {
+                            thrustersOn = false;
                         }
+
+                        if (state == Heli.State.WAITING) {
+                            if (frame.gestures.length > 0) {
+                                var gesture = frame.gestures[0];
+                                switch (gesture.type) {
+                                    case "circle":
+                                        //重新开始
+                                        window.newGame();
+                                        return;
+                                    case "swipe":
+                                        //重新开始
+                                         window.newGame();
+                                        return;
+                                    case "screenTap":
+                                    case "keyTap":
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            }
+
+                        }
+
                     });
 
                 </script><script src="webfont.js"></script>
