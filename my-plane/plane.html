@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <title>HTML5 Helicopter</title>
+
+        <link rel="stylesheet" href="syntax.css" />
+        <link rel="stylesheet" href="screen.css" media="screen, projection" />
+
+    </head>
+
+    <body>
+
+        <div class="site">
+            <div id="post">
+                <h1 class="title">HTML5 Helicopter</h1>
+                <div class="meta">
+                    5th August 2010
+                </div>
+                <span style="font-family:SilkScreenBold;"> </span>
+                <span style="font-family:SilkScreen;"> </span>
+                <div id="helicopter" style="margin-bottom:20px;"></div>
+                <script src="helicopter.js"></script>
+                <script src="modernizr-1.5.min.js"></script>
+                <script src="../leap.js"></script>
+                <script>
+                    var families = ['SilkScreenBold', 'SilkScreen'];
+
+                    var INIT = (function(m, HELICOPTER, families) {
+
+                        var numLoaded = 0, numFonts = families.length, helicopter = document.getElementById('helicopter');
+
+                        function loaded() {
+                            if (m.canvas && m.localstorage && m.audio && (m.audio.ogg || m.audio.mp3)) {
+                                HELICOPTER.init(helicopter, '');
+                            } else {
+                                el.innerHTML = 'Sorry, needs a decent browser<br /><small>' + '(firefox 3.6+, Chrome 4+, Opera 10+ and Safari 4+)</small>';
+                            }
+                        };
+
+                        function fontLoaded(family, desc) {
+                            if (++numLoaded === numFonts) {
+                                loaded();
+                            }
+                        };
+
+                        return {
+                            'fontLoaded' : fontLoaded
+                        };
+
+                    })(Modernizr, HELICOPTER, families);
+
+                    WebFontConfig = {
+                        custom : {
+                            families : families,
+                            urls : ['silkscreenbold.css', 'silkscreen.css']
+                        },
+                        fontactive : INIT.fontLoaded
+                    };
+
+                    //leap
+                    var controllerOptions = {
+                        enableGestures : true
+                    };
+                    Leap.loop(controllerOptions, function(frame) {
+                        if (frame.hands.length > 0) {
+                            var hand = frame.hands[0];
+                            console.log(hand.fingers.length);
+                            if (hand.fingers.length <= 1) {
+                                thrustersOn = true;
+                            } else {
+                                thrustersOn = false;
+                            }
+                        }
+                    });
+
+                </script><script src="webfont.js"></script>
+            </div>
+
+        </div>
+
+    </body>
+</html>

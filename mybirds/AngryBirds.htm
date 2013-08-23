@@ -10,6 +10,9 @@
         <script type="text/javascript" src="Stage.js"></script>
         <script type="text/javascript" src="RemoveObject.js"></script>
         <script type="text/javascript" src="Main.js"></script>
+        
+        <script src="../my-js/jquery-1.7.2.min.js"></script>
+        <script src="../leap.js"></script>
         <script type="text/javascript">
             function doScroll() {
                 if (window.pageYOffset === 0) {
@@ -17,11 +20,15 @@
                 }
             }
 
-
+            function initGame(){
+                $('#mylegend').html('');
+                console.log("initGame");
+                init(20, "mylegend", 1400, 480, main, LEvent.INIT);
+            }
             window.onload = function() {
                 setTimeout(doScroll, 100);
                 LSystem.screen(LStage.FULL_SCREEN);
-                init(10, "mylegend", 1400, 480, main, LEvent.INIT);
+                initGame();
             }
             window.onorientationchange = function() {
                 setTimeout(doScroll, 100);
@@ -31,8 +38,7 @@
             }
         </script>
 
-        <script src="../my-js/jquery-1.7.2.min.js"></script>
-        <script src="../leap.js"></script>
+        
         <script>
             // Setup Leap loop with frame callback function
             var controllerOptions = {
@@ -75,7 +81,7 @@
             var positionInited = false;
             var initedPosition = null;
             var initedHandPosition = null;
-            var ratio = 25;
+            var ratio = 3;
             var lastX, lastY;
 
             //调用小鸟move
@@ -88,7 +94,6 @@
                 var selfY = vector[2] * ratio;
 
                 var r = Math.sqrt(Math.pow((startX0 - selfX), 2) + Math.pow((startY0 - selfY), 2));
-                r = r / 5;
                 if (r > 100)
                     r = 100;
                 var angle = Math.atan2(selfY - startY0, selfX - startX0);
@@ -105,10 +110,31 @@
             }
 
             var lazyReady = false;
-            var shooting=false;
+            var shooted = false;
             var lazyReadyTask = null;
             Leap.loop(controllerOptions, function(frame) {
-                if(shooting){
+                if (frame.gestures.length > 0) {
+                    console.log("gestures");
+                    var gesture = frame.gestures[0];
+                    switch (gesture.type) {
+                        case "circle":
+                            if(shooted){
+                                shooted = false;
+                                initGame();
+                            }
+                            return;
+                        case "swipe":
+                            //重新开始
+                            console.log("swipe");
+                            return;
+                        case "screenTap":
+                        case "keyTap":
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                if (shooted) {
                     return;
                 }
                 if (frame.hands.length > 0) {
@@ -147,8 +173,8 @@
                             var force = 70;
                             var vec = new LGlobal.box2d.b2Vec2(-force * r * Math.cos(angle), -force * r * Math.sin(angle));
                             bird.box2dBody.ApplyForce(vec, bird.box2dBody.GetWorldCenter());
-                            
-                            shooting=true;
+
+                            shooted = true;
 
                         } else {
                             setPosition(hand);
