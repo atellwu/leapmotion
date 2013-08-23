@@ -55,9 +55,10 @@ Heli.User = function(params) {
 
         _distance += 1;
 
-        momentum += ((thrusters) ? 0.2 : -0.23);
+        momentum += ((thrusters) ? 0.3 : -0.3);
         //原来是0.4和-0.5 add by kezhu
         position += momentum;
+    
 
         if (params.tick() % 2 === 0) {
             _trail.push(position);

@@ -67,7 +67,7 @@
                     Leap.loop(controllerOptions, function(frame) {
                         if (frame.hands.length > 0) {
                             var hand = frame.hands[0];
-                            if (hand.fingers.length <= 2) {
+                            if (hand.fingers.length <= 1) {
                                 thrustersOn = true;
                             } else {
                                 thrustersOn = false;
