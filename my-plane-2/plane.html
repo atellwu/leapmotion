@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <title>是男人就要飞1000米！</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+        <link rel="stylesheet" href="syntax.css" />
+        <link rel="stylesheet" href="screen.css" media="screen, projection" />
+
+    </head>
+
+    <body>
+
+        <div class="site">
+            <div id="post">
+                <h1 class="title">是男人就要飞1000米！</h1>
+                <div class="meta">
+                    @dianping
+                </div>
+                <span style="font-family:SilkScreenBold;"> </span>
+                <span style="font-family:SilkScreen;"> </span>
+                <div id="helicopter" style="margin-bottom:20px;"></div>
+                <script src="helicopter.js"></script>
+                <script src="modernizr-1.5.min.js"></script>
+                <script src="../leap.js"></script>
+                <script>
+                    var families = ['SilkScreenBold', 'SilkScreen'];
+
+                    var INIT = (function(m, HELICOPTER, families) {
+
+                        var numLoaded = 0, numFonts = families.length, helicopter = document.getElementById('helicopter');
+
+                        function loaded() {
+                            if (m.canvas && m.localstorage && m.audio && (m.audio.ogg || m.audio.mp3)) {
+                                HELICOPTER.init(helicopter, '');
+                            } else {
+                                el.innerHTML = 'Sorry, needs a decent browser<br /><small>' + '(firefox 3.6+, Chrome 4+, Opera 10+ and Safari 4+)</small>';
+                            }
+                        };
+
+                        function fontLoaded(family, desc) {
+                            if (++numLoaded === numFonts) {
+                                loaded();
+                            }
+                        };
+
+                        return {
+                            'fontLoaded' : fontLoaded
+                        };
+
+                    })(Modernizr, HELICOPTER, families);
+
+                    WebFontConfig = {
+                        custom : {
+                            families : families,
+                            urls : ['silkscreenbold.css', 'silkscreen.css']
+                        },
+                        fontactive : INIT.fontLoaded
+                    };
+
+                    //leap
+                    var positionInited = false;
+                    var initedPosition = null;
+                    var initedHandPosition = null;
+                    var ratio = 5;
+                    var lazyReady = false;
+                    var lazyReadyTask = null;
+
+                    var controllerOptions = {
+                        enableGestures : true
+                    };
+                    Leap.loop(controllerOptions, function(frame) {
+
+                        //操控位置
+                        if (frame.hands.length > 0) {
+                            var hand = frame.hands[0];
+                            if (!positionInited) {//初始化手指的位置
+                                if (lazyReady) {
+                                    var hand = frame.hands[0];
+                                    if (hand.fingers.length == 1) {
+                                        var vector = hand.palmPosition;
+                                        initedPosition = planePosition;
+                                        initedHandPosition = vector[1];
+
+                                        positionInited = true;
+                                    }
+                                } else {
+                                    if (lazyReadyTask == null) {
+                                        lazyReadyTask = setTimeout(function() {
+                                            lazyReady = true;
+                                        }, 200);
+                                    }
+                                }
+                            } else {
+                                var hand = frame.hands[0];
+                                //移动
+                                if (hand.fingers.length == 1) {
+                                    var vector = hand.palmPosition;
+                                    planePosition = initedPosition + (vector[1] - initedHandPosition)/2;
+                                }
+                            }
+                        } else {
+                            clearTimeout(lazyReadyTask);
+                            lazyReady = false;
+                            positionInited = false;
+                            lazyReadyTask = null;
+                        }
+
+                        if (state == Heli.State.WAITING) {
+                            if (frame.gestures.length > 0) {
+                                var gesture = frame.gestures[0];
+                                switch (gesture.type) {
+                                    case "circle":
+                                        //重新开始
+                                        window.newGame();
+                                        return;
+                                    case "swipe":
+                                        //重新开始
+                                        window.newGame();
+                                        return;
+                                    case "screenTap":
+                                    case "keyTap":
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            }
+
+                        }
+
+                    });
+
+                </script><script src="webfont.js"></script>
+            </div>
+
+        </div>
+
+    </body>
+</html>
