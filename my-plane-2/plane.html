@@ -78,7 +78,7 @@
                             if (!positionInited) {//初始化手指的位置
                                 if (lazyReady) {
                                     var hand = frame.hands[0];
-                                    if (hand.fingers.length == 1) {
+                                    if (hand.fingers.length >= 4) {
                                         var vector = hand.palmPosition;
                                         initedPosition = planePosition;
                                         initedHandPosition = vector[1];
@@ -95,7 +95,7 @@
                             } else {
                                 var hand = frame.hands[0];
                                 //移动
-                                if (hand.fingers.length == 1) {
+                                if (hand.fingers.length >= 0) {
                                     var vector = hand.palmPosition;
                                     planePosition = initedPosition + (vector[1] - initedHandPosition)/2;
                                 }
